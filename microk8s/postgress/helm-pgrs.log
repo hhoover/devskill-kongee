@@ -1,0 +1,15 @@
+To connect to your database from outside the cluster execute the following commands:
+
+    kubectl port-forward --namespace default svc/demo-postgresql 5432:5432 &
+    PGPASSWORD="" psql --host 127.0.0.1 -U postgres -d postgres -p 5432
+
+PostgreSQL can be accessed via port 5432 on the following DNS name from within your cluster:                                                                                                                                                   
+    demo-postgresql.default.svc.cluster.local - Read/Write connection                                                                                                                                                                          
+To get the password for "postgres" run:                                                                                                                                                                                                        
+    export POSTGRES_PASSWORD=admin                                                                                             
+To connect to your database run the following command:                                                                                                                                                                                         
+    kubectl run demo-postgresql-client --rm --tty -i --restart='Never' --namespace default --image docker.io/bitnami/postgresql:11.11.0-debian-10-r71 --env="PGPASSWORD=" --command -- psql --host demo-postgresql -U postgres -d postgres -p 5432                                                                                                                                                                                                                          
+
+To connect to your database from outside the cluster execute the following commands:                                                                                                                                                           
+    kubectl port-forward --namespace default svc/demo-postgresql 5432:5432 &                                                                                                                                                                   
+    PGPASSWORD="" psql --host 127.0.0.1 -U postgres -d postgres -p 5432  

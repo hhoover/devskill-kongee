@@ -1,0 +1,1294 @@
+---
+# Source: kong/templates/controller-service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gateway-kong
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+---
+# Source: kong/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gateway-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.8
+    release: "gateway"
+    heritage: "Helm"
+type: Opaque
+data:
+  postgresql-password: "bHdGSENMU2V3Qw=="
+---
+# Source: kong/templates/wait-for-postgres-script.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-kong-bash-wait-for-postgres
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+data:
+  wait.sh: |
+    until timeout 2 bash -c "9<>/dev/tcp/${KONG_PG_HOST}/${KONG_PG_PORT}"
+      do echo "waiting for db - trying ${KONG_PG_HOST}:${KONG_PG_PORT}"
+      sleep 2
+    done
+---
+# Source: kong/templates/custom-resource-definitions.yaml
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: kongplugins.configuration.konghq.com
+spec:
+  group: configuration.konghq.com
+  version: v1
+  scope: Namespaced
+  names:
+    kind: KongPlugin
+    plural: kongplugins
+    shortNames:
+    - kp
+  additionalPrinterColumns:
+  - name: Plugin-Type
+    type: string
+    description: Name of the plugin
+    JSONPath: .plugin
+  - name: Age
+    type: date
+    description: Age
+    JSONPath: .metadata.creationTimestamp
+  - name: Disabled
+    type: boolean
+    description: Indicates if the plugin is disabled
+    JSONPath: .disabled
+    priority: 1
+  - name: Config
+    type: string
+    description: Configuration of the plugin
+    JSONPath: .config
+    priority: 1
+  validation:
+    openAPIV3Schema:
+      required:
+      - plugin
+      properties:
+        plugin:
+          type: string
+        disabled:
+          type: boolean
+        config:
+          type: object
+        configFrom:
+          type: object
+          properties:
+            secretKeyRef:
+              required:
+              - name
+              - key
+              type: object
+              properties:
+                name:
+                  type: string
+                key:
+                  type: string
+        run_on:
+          type: string
+          enum:
+          - first
+          - second
+          - all
+        protocols:
+          type: array
+          items:
+            type: string
+            enum:
+            - http
+            - https
+            - grpc
+            - grpcs
+            - tcp
+            - tls
+  subresources:
+    status: {}
+---
+# Source: kong/templates/custom-resource-definitions.yaml
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: kongclusterplugins.configuration.konghq.com
+spec:
+  group: configuration.konghq.com
+  version: v1
+  scope: Cluster
+  names:
+    kind: KongClusterPlugin
+    plural: kongclusterplugins
+    shortNames:
+    - kcp
+  additionalPrinterColumns:
+  - name: Plugin-Type
+    type: string
+    description: Name of the plugin
+    JSONPath: .plugin
+  - name: Age
+    type: date
+    description: Age
+    JSONPath: .metadata.creationTimestamp
+  - name: Disabled
+    type: boolean
+    description: Indicates if the plugin is disabled
+    JSONPath: .disabled
+    priority: 1
+  - name: Config
+    type: string
+    description: Configuration of the plugin
+    JSONPath: .config
+    priority: 1
+  validation:
+    openAPIV3Schema:
+      required:
+      - plugin
+      properties:
+        plugin:
+          type: string
+        disabled:
+          type: boolean
+        config:
+          type: object
+        configFrom:
+          type: object
+          properties:
+            secretKeyRef:
+              required:
+              - name
+              - namespace
+              - key
+              type: object
+              properties:
+                namespace:
+                  type: string
+                name:
+                  type: string
+                key:
+                  type: string
+        run_on:
+          type: string
+          enum:
+          - first
+          - second
+          - all
+        protocols:
+          type: array
+          items:
+            type: string
+            enum:
+            - http
+            - https
+            - grpc
+            - grpcs
+            - tcp
+            - tls
+  subresources:
+    status: {}
+---
+# Source: kong/templates/custom-resource-definitions.yaml
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: kongconsumers.configuration.konghq.com
+spec:
+  group: configuration.konghq.com
+  version: v1
+  scope: Namespaced
+  names:
+    kind: KongConsumer
+    plural: kongconsumers
+    shortNames:
+    - kc
+  additionalPrinterColumns:
+  - name: Username
+    type: string
+    description: Username of a Kong Consumer
+    JSONPath: .username
+  - name: Age
+    type: date
+    description: Age
+    JSONPath: .metadata.creationTimestamp
+  validation:
+    openAPIV3Schema:
+      properties:
+        username:
+          type: string
+        custom_id:
+          type: string
+        credentials:
+          type: array
+          items:
+            type: string
+  subresources:
+    status: {}
+---
+# Source: kong/templates/custom-resource-definitions.yaml
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: kongingresses.configuration.konghq.com
+spec:
+  group: configuration.konghq.com
+  version: v1
+  scope: Namespaced
+  names:
+    kind: KongIngress
+    plural: kongingresses
+    shortNames:
+    - ki
+  validation:
+    openAPIV3Schema:
+      properties:
+        route:
+          properties:
+            methods:
+              type: array
+              items:
+                type: string
+            headers:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            regex_priority:
+              type: integer
+            strip_path:
+              type: boolean
+            preserve_host:
+              type: boolean
+            path_handling:
+              type: string
+              enum:
+              - "v0"
+              - "v1"
+            protocols:
+              type: array
+              items:
+                type: string
+                enum:
+                - http
+                - https
+                - grpc
+                - grpcs
+                - tcp
+                - tls
+            https_redirect_status_code:
+              type: integer
+        proxy:
+          type: object
+          properties:
+            protocol:
+              type: string
+              enum:
+              - http
+              - https
+              - grpc
+              - grpcs
+              - tcp
+              - tls
+            path:
+              type: string
+              pattern: ^/.*$
+            retries:
+              type: integer
+              minimum: 0
+            connect_timeout:
+              type: integer
+              minimum: 0
+            read_timeout:
+              type: integer
+              minimum: 0
+            write_timeout:
+              type: integer
+              minimum: 0
+        upstream:
+          type: object
+          properties:
+            algorithm:
+              type: string
+              enum:
+              - "round-robin"
+              - "consistent-hashing"
+              - "least-connections"
+            host_header:
+              type: string
+            hash_on:
+              type: string
+            hash_on_cookie:
+              type: string
+            hash_on_cookie_path:
+              type: string
+            hash_on_header:
+              type: string
+            hash_fallback_header:
+              type: string
+            hash_fallback:
+              type: string
+            slots:
+              type: integer
+              minimum: 10
+            healthchecks:
+              type: object
+              properties:
+                threshold:
+                  type: integer
+                active:
+                  type: object
+                  properties:
+                    concurrency:
+                      type: integer
+                      minimum: 1
+                    timeout:
+                      type: integer
+                      minimum: 0
+                    http_path:
+                      type: string
+                      pattern: ^/.*$
+                    healthy: &healthy
+                      type: object
+                      properties:
+                        http_statuses:
+                          type: array
+                          items:
+                            type: integer
+                        interval:
+                          type: integer
+                          minimum: 0
+                        successes:
+                          type: integer
+                          minimum: 0
+                    unhealthy: &unhealthy
+                      type: object
+                      properties:
+                        http_failures:
+                          type: integer
+                          minimum: 0
+                        http_statuses:
+                          type: array
+                          items:
+                            type: integer
+                        interval:
+                          type: integer
+                          minimum: 0
+                        tcp_failures:
+                          type: integer
+                          minimum: 0
+                        timeout:
+                          type: integer
+                          minimum: 0
+                passive:
+                  type: object
+                  properties:
+                    healthy: *healthy
+                    unhealthy: *unhealthy
+  subresources:
+    status: {}
+---
+# Source: kong/templates/custom-resource-definitions.yaml
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: tcpingresses.configuration.konghq.com
+spec:
+  group: configuration.konghq.com
+  version: v1beta1
+  scope: Namespaced
+  names:
+    kind: TCPIngress
+    plural: tcpingresses
+  additionalPrinterColumns:
+  - name: Address
+    type: string
+    description: Address of the load balancer
+    JSONPath: .status.loadBalancer.ingress[*].ip
+  - name: Age
+    type: date
+    description: Age
+    JSONPath: .metadata.creationTimestamp
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          type: string
+        kind:
+          type: string
+        metadata:
+          type: object
+        spec:
+          type: object
+          properties:
+            tls:
+              type: array
+              items:
+                type: object
+                properties:
+                  hosts:
+                    type: array
+                    items:
+                      type: string
+                  secretName:
+                    type: string
+            rules:
+              type: array
+              items:
+                type: object
+                properties:
+                  host:
+                    type: string
+                  port:
+                    type: integer
+                    format: int32
+                  backend:
+                    type: object
+                    properties:
+                      serviceName:
+                        type: string
+                      servicePort:
+                        format: int32
+                        type: integer
+        status:
+          type: object
+  subresources:
+    status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+# Source: kong/templates/controller-rbac-resources.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+  name:  gateway-kong
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+      - nodes
+      - pods
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+      - "networking.k8s.io"
+      - "networking.internal.knative.dev"
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+        - events
+    verbs:
+        - create
+        - patch
+  - apiGroups:
+      - "extensions"
+      - "networking.k8s.io"
+      - "networking.internal.knative.dev"
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+  - apiGroups:
+      - "configuration.konghq.com"
+    resources:
+      - tcpingresses/status
+    verbs:
+      - update
+  - apiGroups:
+      - "configuration.konghq.com"
+    resources:
+      - kongplugins
+      - kongclusterplugins
+      - kongcredentials
+      - kongconsumers
+      - kongingresses
+      - tcpingresses
+    verbs:
+      - get
+      - list
+      - watch
+---
+# Source: kong/templates/controller-rbac-resources.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name:  gateway-kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name:  gateway-kong
+subjects:
+  - kind: ServiceAccount
+    name: gateway-kong
+    namespace: kong
+---
+# Source: kong/templates/controller-rbac-resources.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name:  gateway-kong
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - pods
+      - secrets
+      - namespaces
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      # Defaults to "<election-id>-<ingress-class>"
+      # Here: "<kong-ingress-controller-leader-nginx>-<nginx>"
+      # This has to be adapted if you change either parameter
+      # when launching the nginx-ingress-controller.
+      - "kong-ingress-controller-leader-kong-kong"
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+---
+# Source: kong/templates/controller-rbac-resources.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name:  gateway-kong
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: gateway-kong
+subjects:
+  - kind: ServiceAccount
+    name: gateway-kong
+    namespace: kong
+---
+# Source: kong/charts/postgresql/templates/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-postgresql-headless
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.8
+    release: "gateway"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+    release: "gateway"
+---
+# Source: kong/charts/postgresql/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.8
+    release: "gateway"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+    release: "gateway"
+    role: master
+---
+# Source: kong/templates/service-kong-admin.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-kong-admin
+  namespace: kong
+  annotations:
+    konghq.com/protocol: "https"
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+spec:
+  type: NodePort
+  ports:
+  - name: kong-admin-tls
+    port: 8444
+    targetPort: 8444
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: "gateway"
+---
+# Source: kong/templates/service-kong-manager.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-kong-manager
+  namespace: kong
+  annotations:
+    konghq.com/protocol: "https"
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+spec:
+  type: NodePort
+  ports:
+  - name: kong-manager-tls
+    port: 8445
+    targetPort: 8445
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: "gateway"
+---
+# Source: kong/templates/service-kong-portal-api.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-kong-portalapi
+  namespace: kong
+  annotations:
+    konghq.com/protocol: "https"
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+spec:
+  type: NodePort
+  ports:
+  - name: kong-portalapi
+    port: 8004
+    targetPort: 8004
+    protocol: TCP
+  - name: kong-portalapi-tls
+    port: 8447
+    targetPort: 8447
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: "gateway"
+---
+# Source: kong/templates/service-kong-portal.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-kong-portal
+  namespace: kong
+  annotations:
+    konghq.com/protocol: "https"
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+spec:
+  type: NodePort
+  ports:
+  - name: kong-portal
+    port: 8003
+    targetPort: 8003
+    protocol: TCP
+  - name: kong-portal-tls
+    port: 8446
+    targetPort: 8446
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: "gateway"
+---
+# Source: kong/templates/service-kong-proxy.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-kong-proxy
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+    enable-metrics: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - name: kong-proxy
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  - name: kong-proxy-tls
+    port: 443
+    targetPort: 8443
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: "gateway"
+---
+# Source: kong/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-kong
+  namespace:  kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+    app.kubernetes.io/component: app
+  annotations:
+    kuma.io/gateway: "enabled"
+    traffic.sidecar.istio.io/includeInboundPorts: ""
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kong
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: "gateway"
+
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: kong
+        helm.sh/chart: kong-2.1.0
+        app.kubernetes.io/instance: "gateway"
+        app.kubernetes.io/managed-by: "Helm"
+        app.kubernetes.io/version: "2.4"
+        app.kubernetes.io/component: app
+    spec:
+      serviceAccountName: gateway-kong
+      
+      containers:
+      - name: ingress-controller
+        args:
+        - /kong-ingress-controller
+        
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace  
+        
+        
+        - name: CONTROLLER_ELECTION_ID
+          value: "kong-ingress-controller-leader-kong"
+        - name: CONTROLLER_INGRESS_CLASS
+          value: "kong"
+        - name: CONTROLLER_KONG_ADMIN_TLS_SKIP_VERIFY
+          value: "true"
+        - name: CONTROLLER_KONG_ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: kong-enterprise-superuser-password
+        - name: CONTROLLER_KONG_ADMIN_URL
+          value: "https://localhost:8444"
+        - name: CONTROLLER_PUBLISH_SERVICE
+          value: "kong/gateway-kong-proxy"
+        image: kong/kubernetes-ingress-controller:1.2
+        imagePullPolicy: IfNotPresent
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          {}
+      
+      - name: "proxy"
+        image: kong/kong-gateway:2.3.3.2-alpine
+        imagePullPolicy: IfNotPresent
+        env:
+         
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_API_URI
+          value: "http://admin.kong.microk8s.lab"
+        - name: KONG_ADMIN_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_GUI_LISTEN
+          value: "0.0.0.0:8445 http2 ssl"
+        - name: KONG_ADMIN_GUI_URL
+          value: "http://manager.kong.microk8s.lab"
+        - name: KONG_ADMIN_LISTEN
+          value: "0.0.0.0:8444 http2 ssl"
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_CLUSTER_TELEMETRY_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: "off"
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LICENSE_DATA
+          valueFrom:
+            secretKeyRef:
+              name: kong-enterprise-license
+              key: license
+        - name: KONG_LUA_PACKAGE_PATH
+          value: "/opt/?.lua;/opt/?/init.lua;;"
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_HOST
+          value: "gateway-postgresql"
+        - name: KONG_PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gateway-postgresql
+              key: postgresql-password
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PLUGINS
+          value: "bundled"
+        - name: KONG_PORTAL
+          value: "on"
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_PORTAL_API_LISTEN
+          value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
+        - name: KONG_PORTAL_API_URL
+          value: "http://portalapi.kong.microk8s.lab"
+        - name: KONG_PORTAL_GUI_HOST
+          value: "portal.kong.microk8s.lab"
+        - name: KONG_PORTAL_GUI_LISTEN
+          value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
+        - name: KONG_PORTAL_GUI_PROTOCOL
+          value: "https"
+        - name: KONG_PORT_MAPS
+          value: "80:8000, 443:8443"
+        - name: KONG_PREFIX
+          value: "/kong_prefix/"
+        - name: KONG_PROXY_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PROXY_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_PROXY_LISTEN
+          value: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
+        - name: KONG_SMTP_MOCK
+          value: "on"
+        - name: KONG_STATUS_LISTEN
+          value: "0.0.0.0:8100"
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - /bin/sleep 15 && kong quit
+        ports:
+        - name: admin-tls
+          containerPort: 8444
+          protocol: TCP
+        - name: proxy
+          containerPort: 8000
+          protocol: TCP
+        - name: proxy-tls
+          containerPort: 8443
+          protocol: TCP
+        - name: status
+          containerPort: 8100
+          protocol: TCP
+        - name: manager-tls
+          containerPort: 8445
+          protocol: TCP
+        - name: portal
+          containerPort: 8003
+          protocol: TCP
+        - name: portal-tls
+          containerPort: 8446
+          protocol: TCP
+        - name: portalapi
+          containerPort: 8004
+          protocol: TCP
+        - name: portalapi-tls
+          containerPort: 8447
+          protocol: TCP
+        volumeMounts:
+          - name: gateway-kong-prefix-dir
+            mountPath: /kong_prefix/
+          - name: gateway-kong-tmp
+            mountPath: /tmp
+          
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /status
+            port: status
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /status
+            port: status
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          {} 
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        []
+      volumes:
+        - name: gateway-kong-prefix-dir
+          emptyDir: {}
+        - name: gateway-kong-tmp
+          emptyDir: {}
+        - name: gateway-kong-bash-wait-for-postgres
+          configMap:
+            name: gateway-kong-bash-wait-for-postgres
+            defaultMode: 0755
+---
+# Source: kong/charts/postgresql/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gateway-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.8
+    release: "gateway"
+    heritage: "Helm"
+spec:
+  serviceName: gateway-postgresql-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: postgresql
+      release: "gateway"
+      role: master
+  template:
+    metadata:
+      name: gateway-postgresql
+      labels:
+        app: postgresql
+        chart: postgresql-8.6.8
+        release: "gateway"
+        heritage: "Helm"
+        role: master
+    spec:      
+      securityContext:
+        fsGroup: 1001
+      containers:
+        - name: gateway-postgresql
+          image: docker.io/bitnami/postgresql:11.7.0-debian-10-r37
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            - name: POSTGRES_USER
+              value: "kong"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-postgresql
+                  key: postgresql-password
+            - name: POSTGRES_DB
+              value: "kong"
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "kong" -d "kong" -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "kong" -d "kong" -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: /bitnami/postgresql
+              subPath: 
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"
+---
+# Source: kong/templates/service-kong-admin.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-kong-admin
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+  - host: admin.kong.microk8s.lab
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: gateway-kong-admin
+            servicePort: 8444
+---
+# Source: kong/templates/service-kong-manager.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-kong-manager
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+spec:
+  rules:
+  - host: manager.kong.microk8s.lab
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: gateway-kong-manager
+            servicePort: 8445
+---
+# Source: kong/templates/service-kong-portal-api.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-kong-portalapi
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+  - host: portalapi.kong.microk8s.lab
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: gateway-kong-portalapi
+            servicePort: 8447
+---
+# Source: kong/templates/service-kong-portal.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-kong-portal
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.1.0
+    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.4"
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+  - host: portal.kong.microk8s.lab
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: gateway-kong-portal
+            servicePort: 8446
+  tls:
+  - hosts:
+    - portal.kong.microk8s.lab
+    secretName: microk8s-portal-tls-secret

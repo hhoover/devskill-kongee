@@ -1,0 +1,35 @@
+root@konductor kong$ kubectl apply -n kong -f generated.yaml
+serviceaccount/gateway-kong created
+secret/gateway-postgresql created
+configmap/gateway-kong-bash-wait-for-postgres created
+Warning: apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition
+customresourcedefinition.apiextensions.k8s.io/kongplugins.configuration.konghq.com unchanged
+customresourcedefinition.apiextensions.k8s.io/kongclusterplugins.configuration.konghq.com unchanged
+customresourcedefinition.apiextensions.k8s.io/kongconsumers.configuration.konghq.com unchanged
+customresourcedefinition.apiextensions.k8s.io/kongingresses.configuration.konghq.com unchanged
+customresourcedefinition.apiextensions.k8s.io/tcpingresses.configuration.konghq.com configured
+Warning: rbac.authorization.k8s.io/v1beta1 ClusterRole is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRole
+clusterrole.rbac.authorization.k8s.io/gateway-kong unchanged
+Warning: rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding
+clusterrolebinding.rbac.authorization.k8s.io/gateway-kong unchanged
+Warning: rbac.authorization.k8s.io/v1beta1 Role is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 Role
+role.rbac.authorization.k8s.io/gateway-kong created
+Warning: rbac.authorization.k8s.io/v1beta1 RoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 RoleBinding
+rolebinding.rbac.authorization.k8s.io/gateway-kong created
+service/gateway-postgresql-headless created
+service/gateway-postgresql created
+service/gateway-kong-admin created
+service/gateway-kong-manager created
+service/gateway-kong-portalapi created
+service/gateway-kong-portal created
+service/gateway-kong-proxy created
+deployment.apps/gateway-kong created
+statefulset.apps/gateway-postgresql created
+job.batch/gateway-kong-init-migrations created
+Warning: extensions/v1beta1 Ingress is deprecated in v1.14+, unavailable in v1.22+; use networking.k8s.io/v1 Ingress
+ingress.extensions/gateway-kong-admin created
+ingress.extensions/gateway-kong-manager created
+ingress.extensions/gateway-kong-portalapi created
+ingress.extensions/gateway-kong-portal created
+job.batch/gateway-kong-post-upgrade-migrations created
+job.batch/gateway-kong-pre-upgrade-migrations created

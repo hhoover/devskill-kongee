@@ -1,0 +1,34 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kong-admin-ingress
+  namespace: kong
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+  - host: admin.kong.microk8s.lab
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: gateway-kong-admin 
+          servicePort: 32254
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kong-manager-ingress
+  namespace: kong
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+  - host: manager.kong.microk8s.lab
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: gateway-kong-manager
+          servicePort: 8445

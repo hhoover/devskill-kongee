@@ -1,0 +1,4 @@
+kubectl patch storageclass openebs-hostpath -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm install demo bitnami/postgresql --set persistence.storageClass=openebs-hostpath --set postgresqlPassword=admin

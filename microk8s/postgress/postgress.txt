@@ -1,0 +1,3 @@
+url: demo-postgresql.default.svc.cluster.local:5432
+uname: postgres
+pwd: admin
