@@ -3,12 +3,12 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: gateway-kong
+  name: eks-kong
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 ---
@@ -19,10 +19,10 @@ metadata:
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
-  name:  gateway-kong
+  name:  eks-kong
 rules:
   - apiGroups:
       - ""
@@ -97,32 +97,32 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name:  gateway-kong
+  name:  eks-kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name:  gateway-kong
+  name:  eks-kong
 subjects:
   - kind: ServiceAccount
-    name: gateway-kong
+    name: eks-kong
     namespace: kong
 ---
 # Source: kong/templates/controller-rbac-resources.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name:  gateway-kong
+  name:  eks-kong
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 rules:
@@ -165,35 +165,35 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name:  gateway-kong
+  name:  eks-kong
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: gateway-kong
+  name: eks-kong
 subjects:
   - kind: ServiceAccount
-    name: gateway-kong
+    name: eks-kong
     namespace: kong
 ---
 # Source: kong/templates/service-kong-admin.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-kong-admin
+  name: eks-kong-admin
   namespace: kong
   annotations:
     konghq.com/protocol: "https"
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 spec:
@@ -206,20 +206,20 @@ spec:
   selector:
     app.kubernetes.io/name: kong
     app.kubernetes.io/component: app
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
 ---
 # Source: kong/templates/service-kong-manager.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-kong-manager
+  name: eks-kong-manager
   namespace: kong
   annotations:
     konghq.com/protocol: "https"
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 spec:
@@ -232,20 +232,20 @@ spec:
   selector:
     app.kubernetes.io/name: kong
     app.kubernetes.io/component: app
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
 ---
 # Source: kong/templates/service-kong-portal-api.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-kong-portalapi
+  name: eks-kong-portalapi
   namespace: kong
   annotations:
     konghq.com/protocol: "https"
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 spec:
@@ -262,20 +262,20 @@ spec:
   selector:
     app.kubernetes.io/name: kong
     app.kubernetes.io/component: app
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
 ---
 # Source: kong/templates/service-kong-portal.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-kong-portal
+  name: eks-kong-portal
   namespace: kong
   annotations:
     konghq.com/protocol: "https"
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
 spec:
@@ -292,18 +292,18 @@ spec:
   selector:
     app.kubernetes.io/name: kong
     app.kubernetes.io/component: app
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
 ---
 # Source: kong/templates/service-kong-proxy.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-kong-proxy
+  name: eks-kong-proxy
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
     enable-metrics: "true"
@@ -321,18 +321,18 @@ spec:
   selector:
     app.kubernetes.io/name: kong
     app.kubernetes.io/component: app
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
 ---
 # Source: kong/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-kong
+  name: eks-kong
   namespace:  kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
     app.kubernetes.io/component: app
@@ -345,7 +345,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: kong
       app.kubernetes.io/component: app
-      app.kubernetes.io/instance: "gateway"
+      app.kubernetes.io/instance: "eks"
 
   template:
     metadata:
@@ -353,12 +353,12 @@ spec:
       labels:
         app.kubernetes.io/name: kong
         helm.sh/chart: kong-2.1.0
-        app.kubernetes.io/instance: "gateway"
+        app.kubernetes.io/instance: "eks"
         app.kubernetes.io/managed-by: "Helm"
         app.kubernetes.io/version: "2.4"
         app.kubernetes.io/component: app
     spec:
-      serviceAccountName: gateway-kong
+      serviceAccountName: eks-kong
       
       initContainers:
       
@@ -370,24 +370,17 @@ spec:
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_API_URI
-          value: "https://admin.kong.microk8s.lab"
+          value: "http://admin.kong.eks.lab"
         - name: KONG_ADMIN_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_ACCESS_LOG
           value: "/dev/stdout"
-        - name: KONG_ADMIN_GUI_AUTH
-          value: "basic-auth"
         - name: KONG_ADMIN_GUI_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_LISTEN
           value: "0.0.0.0:8445 http2 ssl"
-        - name: KONG_ADMIN_GUI_SESSION_CONF
-          valueFrom:
-            secretKeyRef:
-              name: kong-session-config
-              key: admin_gui_session_conf
         - name: KONG_ADMIN_GUI_URL
-          value: "https://manager.kong.microk8s.lab"
+          value: "http://manager.kong.eks.lab"
         - name: KONG_ADMIN_LISTEN
           value: "0.0.0.0:8444 http2 ssl"
         - name: KONG_CLUSTER_LISTEN
@@ -396,8 +389,6 @@ spec:
           value: "off"
         - name: KONG_DATABASE
           value: "postgres"
-        - name: KONG_ENFORCE_RBAC
-          value: "on"
         - name: KONG_KIC
           value: "on"
         - name: KONG_LICENSE_DATA
@@ -411,15 +402,10 @@ spec:
           value: "/opt/?.lua;/opt/?/init.lua;;"
         - name: KONG_NGINX_WORKER_PROCESSES
           value: "2"
-        - name: KONG_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: kong-enterprise-superuser-password
         - name: KONG_PG_DATABASE
           value: "kong"
         - name: KONG_PG_HOST
-          value: "postgresql.postgresql.svc.cluster.local"
+          value: "db-democomcastfargate-kongee.ctzjaxtr66nw.us-east-2.rds.amazonaws.com"
         - name: KONG_PG_PASSWORD
           value: "rdspostgresql"
         - name: KONG_PG_PORT
@@ -439,9 +425,9 @@ spec:
         - name: KONG_PORTAL_API_LISTEN
           value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
         - name: KONG_PORTAL_API_URL
-          value: "https://portalapi.kong.microk8s.lab"
+          value: "http://portalapi.kong.eks.lab"
         - name: KONG_PORTAL_GUI_HOST
-          value: "portal.kong.microk8s.lab"
+          value: "portal.kong.eks.lab"
         - name: KONG_PORTAL_GUI_LISTEN
           value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
         - name: KONG_PORTAL_GUI_PROTOCOL
@@ -465,9 +451,9 @@ spec:
       
         command: [ "/bin/sh", "-c", "until kong start; do echo 'waiting for db'; sleep 1; done; kong stop; rm -fv '/kong_prefix//stream_rpc.sock'"]
         volumeMounts:
-          - name: gateway-kong-prefix-dir
+          - name: eks-kong-prefix-dir
             mountPath: /kong_prefix/
-          - name: gateway-kong-tmp
+          - name: eks-kong-tmp
             mountPath: /tmp
           
         resources:
@@ -504,7 +490,7 @@ spec:
         - name: CONTROLLER_KONG_ADMIN_URL
           value: "https://localhost:8444"
         - name: CONTROLLER_PUBLISH_SERVICE
-          value: "kong/gateway-kong-proxy"
+          value: "kong/eks-kong-proxy"
         image: kong/kubernetes-ingress-controller:1.2
         imagePullPolicy: IfNotPresent
         readinessProbe:
@@ -538,24 +524,17 @@ spec:
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_API_URI
-          value: "https://admin.kong.microk8s.lab"
+          value: "http://admin.kong.eks.lab"
         - name: KONG_ADMIN_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_ACCESS_LOG
           value: "/dev/stdout"
-        - name: KONG_ADMIN_GUI_AUTH
-          value: "basic-auth"
         - name: KONG_ADMIN_GUI_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_LISTEN
           value: "0.0.0.0:8445 http2 ssl"
-        - name: KONG_ADMIN_GUI_SESSION_CONF
-          valueFrom:
-            secretKeyRef:
-              name: kong-session-config
-              key: admin_gui_session_conf
         - name: KONG_ADMIN_GUI_URL
-          value: "https://manager.kong.microk8s.lab"
+          value: "http://manager.kong.eks.lab"
         - name: KONG_ADMIN_LISTEN
           value: "0.0.0.0:8444 http2 ssl"
         - name: KONG_CLUSTER_LISTEN
@@ -564,8 +543,6 @@ spec:
           value: "off"
         - name: KONG_DATABASE
           value: "postgres"
-        - name: KONG_ENFORCE_RBAC
-          value: "on"
         - name: KONG_KIC
           value: "on"
         - name: KONG_LICENSE_DATA
@@ -579,15 +556,10 @@ spec:
           value: "/opt/?.lua;/opt/?/init.lua;;"
         - name: KONG_NGINX_WORKER_PROCESSES
           value: "2"
-        - name: KONG_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: kong-enterprise-superuser-password
         - name: KONG_PG_DATABASE
           value: "kong"
         - name: KONG_PG_HOST
-          value: "postgresql.postgresql.svc.cluster.local"
+          value: "db-democomcastfargate-kongee.ctzjaxtr66nw.us-east-2.rds.amazonaws.com"
         - name: KONG_PG_PASSWORD
           value: "rdspostgresql"
         - name: KONG_PG_PORT
@@ -607,9 +579,9 @@ spec:
         - name: KONG_PORTAL_API_LISTEN
           value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
         - name: KONG_PORTAL_API_URL
-          value: "https://portalapi.kong.microk8s.lab"
+          value: "http://portalapi.kong.eks.lab"
         - name: KONG_PORTAL_GUI_HOST
-          value: "portal.kong.microk8s.lab"
+          value: "portal.kong.eks.lab"
         - name: KONG_PORTAL_GUI_LISTEN
           value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
         - name: KONG_PORTAL_GUI_PROTOCOL
@@ -668,9 +640,9 @@ spec:
           containerPort: 8447
           protocol: TCP
         volumeMounts:
-          - name: gateway-kong-prefix-dir
+          - name: eks-kong-prefix-dir
             mountPath: /kong_prefix/
-          - name: gateway-kong-tmp
+          - name: eks-kong-tmp
             mountPath: /tmp
           
         readinessProbe:
@@ -701,21 +673,21 @@ spec:
       tolerations:
         []
       volumes:
-        - name: gateway-kong-prefix-dir
+        - name: eks-kong-prefix-dir
           emptyDir: {}
-        - name: gateway-kong-tmp
+        - name: eks-kong-tmp
           emptyDir: {}
 ---
 # Source: kong/templates/migrations.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gateway-kong-init-migrations
+  name: eks-kong-init-migrations
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
     app.kubernetes.io/component: init-migrations
@@ -727,7 +699,7 @@ spec:
       labels:
         app.kubernetes.io/name: kong
         helm.sh/chart: kong-2.1.0
-        app.kubernetes.io/instance: "gateway"
+        app.kubernetes.io/instance: "eks"
         app.kubernetes.io/managed-by: "Helm"
         app.kubernetes.io/version: "2.4"
         app.kubernetes.io/component: init-migrations
@@ -743,24 +715,17 @@ spec:
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_API_URI
-          value: "https://admin.kong.microk8s.lab"
+          value: "http://admin.kong.eks.lab"
         - name: KONG_ADMIN_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_ACCESS_LOG
           value: "/dev/stdout"
-        - name: KONG_ADMIN_GUI_AUTH
-          value: "basic-auth"
         - name: KONG_ADMIN_GUI_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_LISTEN
           value: "0.0.0.0:8445 http2 ssl"
-        - name: KONG_ADMIN_GUI_SESSION_CONF
-          valueFrom:
-            secretKeyRef:
-              name: kong-session-config
-              key: admin_gui_session_conf
         - name: KONG_ADMIN_GUI_URL
-          value: "https://manager.kong.microk8s.lab"
+          value: "http://manager.kong.eks.lab"
         - name: KONG_ADMIN_LISTEN
           value: "0.0.0.0:8444 http2 ssl"
         - name: KONG_CLUSTER_LISTEN
@@ -769,8 +734,6 @@ spec:
           value: "off"
         - name: KONG_DATABASE
           value: "postgres"
-        - name: KONG_ENFORCE_RBAC
-          value: "on"
         - name: KONG_KIC
           value: "on"
         - name: KONG_LICENSE_DATA
@@ -784,15 +747,10 @@ spec:
           value: "/opt/?.lua;/opt/?/init.lua;;"
         - name: KONG_NGINX_WORKER_PROCESSES
           value: "2"
-        - name: KONG_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: kong-enterprise-superuser-password
         - name: KONG_PG_DATABASE
           value: "kong"
         - name: KONG_PG_HOST
-          value: "postgresql.postgresql.svc.cluster.local"
+          value: "db-democomcastfargate-kongee.ctzjaxtr66nw.us-east-2.rds.amazonaws.com"
         - name: KONG_PG_PASSWORD
           value: "rdspostgresql"
         - name: KONG_PG_PORT
@@ -812,9 +770,9 @@ spec:
         - name: KONG_PORTAL_API_LISTEN
           value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
         - name: KONG_PORTAL_API_URL
-          value: "https://portalapi.kong.microk8s.lab"
+          value: "http://portalapi.kong.eks.lab"
         - name: KONG_PORTAL_GUI_HOST
-          value: "portal.kong.microk8s.lab"
+          value: "portal.kong.eks.lab"
         - name: KONG_PORTAL_GUI_LISTEN
           value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
         - name: KONG_PORTAL_GUI_PROTOCOL
@@ -839,9 +797,9 @@ spec:
           value: "off"
         command: [ "/bin/sh", "-c", "kong migrations bootstrap" ]
         volumeMounts:
-        - name: gateway-kong-prefix-dir
+        - name: eks-kong-prefix-dir
           mountPath: /kong_prefix/
-        - name: gateway-kong-tmp
+        - name: eks-kong-tmp
           mountPath: /tmp
         resources:
           {}
@@ -849,122 +807,108 @@ spec:
         {}
       restartPolicy: OnFailure
       volumes:
-      - name: gateway-kong-prefix-dir
+      - name: eks-kong-prefix-dir
         emptyDir: {}
-      - name: gateway-kong-tmp
+      - name: eks-kong-tmp
         emptyDir: {}
 ---
 # Source: kong/templates/service-kong-admin.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: gateway-kong-admin
+  name: eks-kong-admin
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
   annotations:
     kubernetes.io/ingress.class: "kong"
 spec:
   rules:
-  - host: admin.kong.microk8s.lab
+  - host: admin.kong.eks.lab
     http:
       paths:
         - path: /
           backend:
-            serviceName: gateway-kong-admin
+            serviceName: eks-kong-admin
             servicePort: 8444
-  tls:
-  - hosts:
-    - admin.kong.microk8s.lab
-    secretName: kong-admin-tls-secret
 ---
 # Source: kong/templates/service-kong-manager.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: gateway-kong-manager
+  name: eks-kong-manager
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
-  annotations:
-    kubernetes.io/ingress.class: "kong"
 spec:
   rules:
-  - host: manager.kong.microk8s.lab
+  - host: manager.kong.eks.lab
     http:
       paths:
         - path: /
           backend:
-            serviceName: gateway-kong-manager
+            serviceName: eks-kong-manager
             servicePort: 8445
-  tls:
-  - hosts:
-    - manager.kong.microk8s.lab
-    secretName: kong-manager-tls-secret
 ---
 # Source: kong/templates/service-kong-portal-api.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: gateway-kong-portalapi
+  name: eks-kong-portalapi
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
   annotations:
     kubernetes.io/ingress.class: "kong"
 spec:
   rules:
-  - host: portalapi.kong.microk8s.lab
+  - host: portalapi.kong.eks.lab
     http:
       paths:
         - path: /
           backend:
-            serviceName: gateway-kong-portalapi
+            serviceName: eks-kong-portalapi
             servicePort: 8447
-  tls:
-  - hosts:
-    - portalapi.kong.microk8s.lab
-    secretName: kong-portalapi-tls-secret
 ---
 # Source: kong/templates/service-kong-portal.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: gateway-kong-portal
+  name: eks-kong-portal
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
   annotations:
     kubernetes.io/ingress.class: "kong"
 spec:
   rules:
-  - host: portal.kong.microk8s.lab
+  - host: portal.kong.eks.lab
     http:
       paths:
         - path: /
           backend:
-            serviceName: gateway-kong-portal
+            serviceName: eks-kong-portal
             servicePort: 8446
   tls:
   - hosts:
-    - portal.kong.microk8s.lab
-    secretName: kong-portal-tls-secret
+    - portal.kong.eks.lab
+    secretName: eks-portal-tls-secret
 ---
 # Source: kong/templates/migrations-post-upgrade.yaml
 # Why is this Job duplicated and not using only helm hooks?
@@ -972,12 +916,12 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gateway-kong-post-upgrade-migrations
+  name: eks-kong-post-upgrade-migrations
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
     app.kubernetes.io/component: post-upgrade-migrations
@@ -991,7 +935,7 @@ spec:
       labels:
         app.kubernetes.io/name: kong
         helm.sh/chart: kong-2.1.0
-        app.kubernetes.io/instance: "gateway"
+        app.kubernetes.io/instance: "eks"
         app.kubernetes.io/managed-by: "Helm"
         app.kubernetes.io/version: "2.4"
         app.kubernetes.io/component: post-upgrade-migrations
@@ -1007,24 +951,17 @@ spec:
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_API_URI
-          value: "https://admin.kong.microk8s.lab"
+          value: "http://admin.kong.eks.lab"
         - name: KONG_ADMIN_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_ACCESS_LOG
           value: "/dev/stdout"
-        - name: KONG_ADMIN_GUI_AUTH
-          value: "basic-auth"
         - name: KONG_ADMIN_GUI_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_LISTEN
           value: "0.0.0.0:8445 http2 ssl"
-        - name: KONG_ADMIN_GUI_SESSION_CONF
-          valueFrom:
-            secretKeyRef:
-              name: kong-session-config
-              key: admin_gui_session_conf
         - name: KONG_ADMIN_GUI_URL
-          value: "https://manager.kong.microk8s.lab"
+          value: "http://manager.kong.eks.lab"
         - name: KONG_ADMIN_LISTEN
           value: "0.0.0.0:8444 http2 ssl"
         - name: KONG_CLUSTER_LISTEN
@@ -1033,8 +970,6 @@ spec:
           value: "off"
         - name: KONG_DATABASE
           value: "postgres"
-        - name: KONG_ENFORCE_RBAC
-          value: "on"
         - name: KONG_KIC
           value: "on"
         - name: KONG_LICENSE_DATA
@@ -1048,15 +983,10 @@ spec:
           value: "/opt/?.lua;/opt/?/init.lua;;"
         - name: KONG_NGINX_WORKER_PROCESSES
           value: "2"
-        - name: KONG_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: kong-enterprise-superuser-password
         - name: KONG_PG_DATABASE
           value: "kong"
         - name: KONG_PG_HOST
-          value: "postgresql.postgresql.svc.cluster.local"
+          value: "db-democomcastfargate-kongee.ctzjaxtr66nw.us-east-2.rds.amazonaws.com"
         - name: KONG_PG_PASSWORD
           value: "rdspostgresql"
         - name: KONG_PG_PORT
@@ -1076,9 +1006,9 @@ spec:
         - name: KONG_PORTAL_API_LISTEN
           value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
         - name: KONG_PORTAL_API_URL
-          value: "https://portalapi.kong.microk8s.lab"
+          value: "http://portalapi.kong.eks.lab"
         - name: KONG_PORTAL_GUI_HOST
-          value: "portal.kong.microk8s.lab"
+          value: "portal.kong.eks.lab"
         - name: KONG_PORTAL_GUI_LISTEN
           value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
         - name: KONG_PORTAL_GUI_PROTOCOL
@@ -1103,9 +1033,9 @@ spec:
           value: "off"
         command: [ "/bin/sh", "-c", "kong migrations finish" ]
         volumeMounts:
-        - name: gateway-kong-prefix-dir
+        - name: eks-kong-prefix-dir
           mountPath: /kong_prefix/
-        - name: gateway-kong-tmp
+        - name: eks-kong-tmp
           mountPath: /tmp
         resources:
           {}
@@ -1113,9 +1043,9 @@ spec:
         {}
       restartPolicy: OnFailure
       volumes:
-      - name: gateway-kong-prefix-dir
+      - name: eks-kong-prefix-dir
         emptyDir: {}
-      - name: gateway-kong-tmp
+      - name: eks-kong-tmp
         emptyDir: {}
 ---
 # Source: kong/templates/migrations-pre-upgrade.yaml
@@ -1124,12 +1054,12 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gateway-kong-pre-upgrade-migrations
+  name: eks-kong-pre-upgrade-migrations
   namespace: kong
   labels:
     app.kubernetes.io/name: kong
     helm.sh/chart: kong-2.1.0
-    app.kubernetes.io/instance: "gateway"
+    app.kubernetes.io/instance: "eks"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/version: "2.4"
     app.kubernetes.io/component: pre-upgrade-migrations
@@ -1143,7 +1073,7 @@ spec:
       labels:
         app.kubernetes.io/name: kong
         helm.sh/chart: kong-2.1.0
-        app.kubernetes.io/instance: "gateway"
+        app.kubernetes.io/instance: "eks"
         app.kubernetes.io/managed-by: "Helm"
         app.kubernetes.io/version: "2.4"
         app.kubernetes.io/component: pre-upgrade-migrations
@@ -1159,24 +1089,17 @@ spec:
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_API_URI
-          value: "https://admin.kong.microk8s.lab"
+          value: "http://admin.kong.eks.lab"
         - name: KONG_ADMIN_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_ACCESS_LOG
           value: "/dev/stdout"
-        - name: KONG_ADMIN_GUI_AUTH
-          value: "basic-auth"
         - name: KONG_ADMIN_GUI_ERROR_LOG
           value: "/dev/stderr"
         - name: KONG_ADMIN_GUI_LISTEN
           value: "0.0.0.0:8445 http2 ssl"
-        - name: KONG_ADMIN_GUI_SESSION_CONF
-          valueFrom:
-            secretKeyRef:
-              name: kong-session-config
-              key: admin_gui_session_conf
         - name: KONG_ADMIN_GUI_URL
-          value: "https://manager.kong.microk8s.lab"
+          value: "http://manager.kong.eks.lab"
         - name: KONG_ADMIN_LISTEN
           value: "0.0.0.0:8444 http2 ssl"
         - name: KONG_CLUSTER_LISTEN
@@ -1185,8 +1108,6 @@ spec:
           value: "off"
         - name: KONG_DATABASE
           value: "postgres"
-        - name: KONG_ENFORCE_RBAC
-          value: "on"
         - name: KONG_KIC
           value: "on"
         - name: KONG_LICENSE_DATA
@@ -1200,15 +1121,10 @@ spec:
           value: "/opt/?.lua;/opt/?/init.lua;;"
         - name: KONG_NGINX_WORKER_PROCESSES
           value: "2"
-        - name: KONG_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: kong-enterprise-superuser-password
         - name: KONG_PG_DATABASE
           value: "kong"
         - name: KONG_PG_HOST
-          value: "postgresql.postgresql.svc.cluster.local"
+          value: "db-democomcastfargate-kongee.ctzjaxtr66nw.us-east-2.rds.amazonaws.com"
         - name: KONG_PG_PASSWORD
           value: "rdspostgresql"
         - name: KONG_PG_PORT
@@ -1228,9 +1144,9 @@ spec:
         - name: KONG_PORTAL_API_LISTEN
           value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
         - name: KONG_PORTAL_API_URL
-          value: "https://portalapi.kong.microk8s.lab"
+          value: "http://portalapi.kong.eks.lab"
         - name: KONG_PORTAL_GUI_HOST
-          value: "portal.kong.microk8s.lab"
+          value: "portal.kong.eks.lab"
         - name: KONG_PORTAL_GUI_LISTEN
           value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
         - name: KONG_PORTAL_GUI_PROTOCOL
@@ -1255,9 +1171,9 @@ spec:
           value: "off"
         command: [ "/bin/sh", "-c", "kong migrations up" ]
         volumeMounts:
-        - name: gateway-kong-prefix-dir
+        - name: eks-kong-prefix-dir
           mountPath: /kong_prefix/
-        - name: gateway-kong-tmp
+        - name: eks-kong-tmp
           mountPath: /tmp
         resources:
           {}
@@ -1265,7 +1181,7 @@ spec:
         {}
       restartPolicy: OnFailure
       volumes:
-      - name: gateway-kong-prefix-dir
+      - name: eks-kong-prefix-dir
         emptyDir: {}
-      - name: gateway-kong-tmp
+      - name: eks-kong-tmp
         emptyDir: {}

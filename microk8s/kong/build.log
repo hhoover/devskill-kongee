@@ -1,0 +1,5 @@
+# View running config
+kubectl exec -n kong -it pod/gateway-kong-5cddd8766c-ttxrx -- printenv
+
+# Deploy
+helm template kong-api-gateway kong/kong --values ./full-k4k8s-with-kong-enterprise.yaml --namespace kong > generated.yaml

@@ -1,3 +1,24 @@
-url: demo-postgresql.default.svc.cluster.local:5432
-uname: postgres
-pwd: admin
+** Please be patient while the chart is being deployed **
+
+PostgreSQL can be accessed via port 5432 on the following DNS name from within your cluster:
+
+    postgresql.postgresql.svc.cluster.local - Read/Write connection
+
+To get the password for "postgres" run:
+
+    export POSTGRES_ADMIN_PASSWORD=t9BEF67AQM
+
+To get the password for "rdspostgresql" run:
+
+    export POSTGRES_PASSWORD=rdspostgresql
+
+To connect to your database run the following command:
+
+    kubectl run postgresql-client --rm --tty -i --restart='Never' --namespace postgresql --image docker.io/bitnami/postgresql:11.11.0-debian-10-r82 --env="PGPASSWORD=" --command -- psql --host postgresql -U rdspostgresql -d kong -p 5432
+
+
+
+To connect to your database from outside the cluster execute the following commands:
+
+    kubectl port-forward --namespace postgresql svc/postgresql 5432:5432 &
+    PGPASSWORD="" psql --host 127.0.0.1 -U rdspostgresql -d kong -p 5432

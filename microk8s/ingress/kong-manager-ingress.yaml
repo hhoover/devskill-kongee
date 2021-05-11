@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: kong-admin-ingress
+  name: kong-api-gateway-kong-admin
   namespace: kong
   annotations:
     kubernetes.io/ingress.class: kong
@@ -13,13 +13,13 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: gateway-kong-admin 
-          servicePort: 32254
+          serviceName: kong-api-gateway-kong-admin 
+          servicePort: 8444
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: kong-manager-ingress
+  name: kong-api-gateway-kong-manager
   namespace: kong
   annotations:
     kubernetes.io/ingress.class: kong
@@ -30,5 +30,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: gateway-kong-manager
+          serviceName: kong-api-gateway-kong-manager
           servicePort: 8445

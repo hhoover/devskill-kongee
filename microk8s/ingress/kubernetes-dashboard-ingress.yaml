@@ -1,12 +1,15 @@
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: dashboard-ingress
+  name: kubernetes-dashboard
   namespace: kube-system
   annotations:
     kubernetes.io/ingress.class: kong
 spec:
+  tls:
+  - hosts:
+    - dashboard.kube.microk8s.lab
   rules:
   - host: dashboard.kube.microk8s.lab
     http:
@@ -14,4 +17,4 @@ spec:
       - path: /
         backend:
           serviceName: kubernetes-dashboard
-          servicePort: 30610
+          servicePort: 443

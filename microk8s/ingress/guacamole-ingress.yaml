@@ -2,16 +2,16 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: kubernetes-dashboard
-  namespace: kube-system
+  name: guacamole
+  namespace: guacamole
   annotations:
     kubernetes.io/ingress.class: kong
 spec:
   rules:
-  - host: dashboard.kube.microk8s.lab
+  - host: guacamole.test.microk8s.lab
     http:
       paths:
       - path: /
         backend:
-          serviceName: kubernetes-dashboard
-          servicePort: 30610
+          serviceName: guacamole
+          servicePort: 80
