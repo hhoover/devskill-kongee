@@ -12,12 +12,12 @@ variable "region" {
     description = "AWS Region"
     default = "us-east-2"
 }
-variable "aws_access_key" {
-    description = "AWS Access Key ID"
+
+variable "aws_profile" {
+    description = "AWS User Profile"
+    default = "default"
 }
-variable "aws_secret_key" {
-    description = "AWS Access Key Secret" 
-}
+
 variable "availability_zones" {
     description = "AWS VPC Availability Zones"
     default = ["us-east-2a", "us-east-2b", "us-east-2c"]

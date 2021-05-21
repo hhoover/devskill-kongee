@@ -3,7 +3,7 @@ environment = "dev"
 
 additional_tags = { 
   "Name" : "kongFargateDev",
-  "ownerName" : "usrbinkat",
+  "ownerName" : "YOUR NAME HERE",
   "environment" : "dev"
 }
 region = "us-east-2"
