@@ -23,7 +23,7 @@ resource "aws_ecs_service" "main" {
   lifecycle {
     ignore_changes = [task_definition, desired_count]
   }
-  depends_on = [aws_security_group.elb]
+  depends_on = [aws_lb_listener.kong]
 }
 
 resource "aws_lb" "main" {
@@ -43,6 +43,17 @@ resource "aws_lb_target_group" "kong" {
   target_type = "ip"
   tags = var.additional_tags
   depends_on = [aws_lb.main]
+}
+
+resource "aws_lb_listener" "kong" {
+  load_balancer_arn = aws_lb.main.id
+  port     = 8443
+  protocol = "TCP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.kong.id
+    type             = "forward"
+  }
 }
 
 resource "aws_ecs_task_definition" "main" {
