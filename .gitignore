@@ -1,0 +1,6 @@
+credentials.tfvars
+./aws_fargate/credentials.tfvars
+.terraform*
+aws_fargate/.terraform*
+.ssh
+.ssh/*

@@ -3,3 +3,6 @@ kubectl exec -n kong -it pod/gateway-kong-5cddd8766c-ttxrx -- printenv
 
 # Deploy
 helm template kong-api-gateway kong/kong --values ./full-k4k8s-with-kong-enterprise.yaml --namespace kong > generated.yaml
+
+# Troubleshoot
+curl -iks --url https://admin.kong.microk8s.lab/admins -H "kong-admin-token:password"

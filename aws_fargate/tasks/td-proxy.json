@@ -1,0 +1,156 @@
+[
+    {
+        "essential": true,
+        "name": "kong-gateway",
+        "image": "kong/kong-gateway:2.3.3.2-alpine",
+        "entryPoint": [
+            "/docker-entrypoint.sh"
+        ],
+        "command": [
+            "kong",
+            "docker-start"
+        ],
+        "healthCheck": {
+            "command": [
+                "CMD-SHELL",
+                "/usr/local/bin/kong health"
+            ],
+            "startPeriod": 5,
+            "interval": 10,
+            "timeout": 5,
+            "retries": 3
+        },
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-region": "us-east-2",
+                "awslogs-group": "awslogs-kong-fargate",
+                "awslogs-stream-prefix": "awslogs-fargate"
+            }
+        },
+        "portMappings": [
+            {
+                "containerPort": 80,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 443,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8000,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8003,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8004,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8100,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8443,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8444,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8445,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8446,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 8447,
+                "protocol": "tcp"
+            },
+            {
+                "containerPort": 10254,
+                "protocol": "tcp"
+            }
+        ],
+        "environment": [
+            {
+                "name": " KONG_NGINX_DAEMON",
+                "value": "off"
+            },
+            {
+                "name": "KONG_CLUSTER_LISTEN",
+                "value": "off"
+            },
+            {
+                "name": " KONG_STREAM_LISTEN",
+                "value": "off"
+            },
+            {
+                "name": "KONG_NGINX_WORKER_PROCESSES",
+                "value": "2"
+            },
+            {
+                "name": "KONG_PLUGINS",
+                "value": "bundled"
+            },
+            {
+                "name": "KONG_LUA_PACKAGE_PATH",
+                "value": "/opt/?.lua;/opt/?/init.lua;;"
+            },
+            {
+                "name": "KONG_PORT_MAPS",
+                "value": "80:8000, 443:8443"
+            },
+            {
+                "name": "KONG_ADMIN_LISTEN",
+                "value": "127.0.0.1:8444 http2 ssl"
+            },
+            {
+                "name": "KONG_STATUS_LISTEN",
+                "value": "0.0.0.0:8100"
+            },
+            {
+                "name": "KONG_PROXY_LISTEN",
+                "value": "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
+            },
+            {
+                "name": "KONG_ADMIN_ERROR_LOG",
+                "value": "/dev/stderr"
+            },
+            {
+                "name": "KONG_PROXY_ERROR_LOG",
+                "value": "/dev/stderr"
+            },
+            {
+                "name": "KONG_PROXY_ACCESS_LOG",
+                "value": "/dev/stdout"
+            },
+            {
+                "name": "KONG_ADMIN_ACCESS_LOG",
+                "value": "/dev/stdout"
+            },
+            {
+                "name": "KONG_ADMIN_GUI_ERROR_LOG",
+                "value": "/dev/stderr"
+            },
+            {
+                "name": "KONG_PORTAL_API_ERROR_LOG",
+                "value": "/dev/stderr"
+            },
+            {
+                "name": "KONG_PORTAL_API_ACCESS_LOG",
+                "value": "/dev/stdout"
+            },
+            {
+                "name": "KONG_ADMIN_GUI_ACCESS_LOG",
+                "value": "/dev/stdout"
+            }
+        ]
+    }
+]

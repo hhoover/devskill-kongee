@@ -1,0 +1,53 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: kong
+spec:
+  controller: ingress-controllers.konghq.com/kong
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: konductor-code
+  namespace: konductor
+  annotations:
+    app: konductor-code
+  labels:
+    app: konductor-code
+spec:
+  type: ClusterIP
+  selector:
+    app: konductor
+    name: konductor
+    app.kubernetes.io/name: konductor
+  ports:
+    - name: https
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: konductor-code
+  namespace: konductor
+  annotations:
+    kubernetes.io/ingress.class: kong
+  labels:
+    app: konductor-code
+spec:
+  tls:
+  - hosts:
+    - "code.k.microk8s.lab"
+  rules:
+  - host: "code.k.microk8s.lab"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: konductor-code
+            port:
+              name: https

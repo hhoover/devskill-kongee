@@ -1,0 +1,14 @@
+name = "kongFargateDev"
+environment = "dev"
+
+additional_tags = { 
+  "Name" : "kongFargateDev",
+  "ownerName" : "usrbinkat",
+  "environment" : "dev"
+}
+region = "us-east-2"
+availability_zones = ["us-east-2a", "us-east-2b", "us-east-2c"]
+
+cidr = "192.19.0.0/16"
+public_subnets  = ["192.19.1.0/24", "192.19.2.0/24", "192.19.3.0/24"]
+private_subnets = ["192.19.11.0/24", "192.19.12.0/24", "192.19.13.0/24"]

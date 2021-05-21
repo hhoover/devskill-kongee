@@ -1,6 +1,7 @@
 #!/bin/bash -x
-project="konductor-$(hostname)"
-docker rm --force konductor 2>/dev/null
+git_repo=devskill-kongee
+project="konductor-${git_repo}"
+docker rm --force ${project} 2>/dev/null
 docker run -d --rm --privileged \
     --workdir /root/cloudctl \
     -v $(pwd):/root/cloudctl:z \
@@ -9,6 +10,6 @@ docker run -d --rm --privileged \
     -v ${HOME}/.aws:/root/.aws:z \
     -v ${HOME}/.kube:/root/.kube:z \
     -u $(id -u):$(id -g) --user root \
-    --name "konductor" -h "konductor" \
+    --name "${project}" -h "${project}" \
     --pull always -v $(pwd)/.ssh:/root/.ssh \
   quay.io/cloudctl/konductor:code

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: konductor-ssh
+  namespace: konductor
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  ports:
+  - name: ssh
+    port: 2222
+    protocol: TCP
+    targetPort: 2222
+  type: ClusterIP
